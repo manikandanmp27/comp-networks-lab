@@ -2,7 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-//Socket → Connect → Send → Receive
+//Socket->Bind->Listen->Accept->Receive->Send
 int main()
 {
     int s, c;
