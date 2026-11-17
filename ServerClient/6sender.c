@@ -28,8 +28,12 @@ int main() {
     }
 
     printf("Waiting for receiver...\n");
-    len = sizeof(addr);
-    client = accept(sock, (struct sockaddr *)&addr, (socklen_t *)&len);
+
+    // NULL, NULL can be used because we don't need client's IP address.
+    // Old version:
+    // len = sizeof(addr);
+    // client = accept(sock, (struct sockaddr *)&addr, (socklen_t *)&len);
+    client = accept(sock, NULL, NULL);
 
     while (1) {
         printf("Enter Data Frame %d (exit to end): ", i);

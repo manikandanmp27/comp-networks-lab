@@ -1,48 +1,50 @@
 #include <stdio.h>
 #include <string.h>
+
 #define POLY "10001000000100001"
-// Perform modulo-2 division to calculate the CRC remainder.
-void calculateCRC(char bits[], char remainder[]) {
+
+// Perform modulo-2 division to calculate the 16-bit CRC remainder
+void calculateCRC(char bits[], char rem[]) {
     char temp[200];
-    int len = strlen(bits);
-     strcpy(temp, bits);
-    for (int i = 0; i <= len - 17; i++) {
+    strcpy(temp, bits);
+
+    for (int i = 0; i <= strlen(temp) - 17; i++) {
         if (temp[i] == '1') {
             for (int j = 0; j < 17; j++)
                 temp[i + j] = (temp[i + j] == POLY[j]) ? '0' : '1';
         }
     }
-    // Extract the final 16 bits as the CRC remainder.
-    strncpy(remainder, temp + len - 16, 16);
-    remainder[16] = '\0';
+    // Copy the final 16 bits (including null terminator)
+    strcpy(rem, temp + strlen(temp) - 16);
 }
 
 int main() {
-    char data[100], padded[200], crc[17];
-    char frame[200], receivedCRC[17];
-    printf("Enter the data to be sent: ");
-    scanf("%99s", data);
+    char data[100], frame[200], rem[17];
 
-    // Append 16 zeros before calculating the sender's CRC.
-    strcpy(padded, data);
-    strcat(padded, "0000000000000000");
-    calculateCRC(padded, crc);
-    
-    // Append the CRC to the original data to form the frame.
+    printf("Enter the data to be sent: ");
+    scanf("%s", data);
+
+    // 1. Sender: Append 16 zeros & calculate CRC
     strcpy(frame, data);
-    strcat(frame, crc);
-     printf("\nCRC: %s\n", crc);
+    strcat(frame, "0000000000000000");
+    calculateCRC(frame, rem);
+
+    // 2. Transmitted frame = data + CRC
+    strcpy(frame, data);
+    strcat(frame, rem);
+    printf("\nCRC: %s\n", rem);
     printf("Transmitted frame: %s\n", frame);
-     printf("\nEnter the received frame: ");
-    scanf("%199s", frame);
-    
-    // A zero remainder indicates that no error was detected.
-    calculateCRC(frame, receivedCRC);
-    printf("Receiver CRC: %s\n", receivedCRC);
-    if (strcmp(receivedCRC, "0000000000000000") == 0)
+
+    // 3. Receiver: Check received frame
+    printf("\nEnter the received frame: ");
+    scanf("%s", frame);
+    calculateCRC(frame, rem);
+
+    printf("Receiver CRC: %s\n", rem);
+    if (strcmp(rem, "0000000000000000") == 0)
         printf("Received frame is error-free.\n");
     else
         printf("Received frame has one or more errors.\n");
-    
+
     return 0;
 }
